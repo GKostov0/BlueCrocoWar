@@ -1,32 +1,23 @@
 {
-  "name": "client",
+  "name": "my-typescript-project",
   "version": "1.0.0",
-  "private": true,
   "description": "",
   "main": "index.js",
-"scripts": {
-  "build": "webpack --mode=development --watch",
-  "release": "webpack --mode=production",
-  "publish": "npm run release && dotnet publish -c Release"
-},
+  "scripts": {
+    "start": "webpack serve --open",
+    "build": "webpack",
+    "dev": "lite-server"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
-  "dependencies": {
-    "@microsoft/signalr": "^10.0.0",
-    "pixi.js": "^8.15.0"
-  },
   "devDependencies": {
-    "@pixi/devtools": "^2.0.1",
-    "clean-webpack-plugin": "4.0.0",
-    "css-loader": "7.1.2",
-    "html-webpack-plugin": "5.6.6",
-    "mini-css-extract-plugin": "2.10.0",
-    "ts-loader": "9.5.4",
-    "typescript": "5.9.3",
-    "vite": "^7.3.1",
-    "webpack": "5.104.1",
-    "webpack-cli": "6.0.1"
+    "html-webpack-plugin": "^6.0.0",
+    "lite-server": "^2.6.1",
+    "ts-loader": "^9.2.3",
+    "typescript": "^4.3.5",
+    "webpack": "^5.41.1",
+    "webpack-cli": "^4.7.2",
+    "webpack-dev-server": "^3.11.2"
   }
 }
