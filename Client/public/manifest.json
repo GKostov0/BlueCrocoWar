@@ -1,0 +1,22 @@
+{
+    "bundles": [
+        {
+            "name": "backgrounds",
+            "assets": [
+                {
+                    "alias": "background",
+                    "src": "/images/background.jpg"
+                }
+            ]
+        },
+        {
+            "name": "coins",
+            "assets": [
+                {
+                    "alias": "coin_small",
+                    "src": "/images/coin_small.png"
+                }
+            ]
+        }
+    ]
+}

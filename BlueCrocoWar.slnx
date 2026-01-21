@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="BlueCrocoWar.Application/BlueCrocoWar.Application.csproj" />
+  <Project Path="BlueCrocoWar.Domain/BlueCrocoWar.Domain.csproj" />
+  <Project Path="BlueCrocoWar.Infrastructure/BlueCrocoWar.Infrastructure.csproj" />
+  <Project Path="BlueCrocoWar/BlueCrocoWar.csproj" />
+</Solution>
