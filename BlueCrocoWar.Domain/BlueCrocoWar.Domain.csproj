@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="Common\Enums\" />
-    <Folder Include="Common\Models\" />
   </ItemGroup>
 
 </Project>

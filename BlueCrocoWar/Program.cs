@@ -1,4 +1,6 @@
+using BlueCrocoWar.Application.Common.Interfaces;
 using BlueCrocoWar.Hubs;
+using BlueCrocoWar.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +11,8 @@ builder.Services.AddSignalR(e =>
     //e.EnableDetailedErrors = true;
     //e.MaximumReceiveMessageSize = 102400000;
 });
+
+builder.Services.AddSingleton<IPlayerRepository, PlayerRepository>();
 
 builder.Services.AddCors(options =>
 {

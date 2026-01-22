@@ -4,7 +4,7 @@ namespace BlueCrocoWar.Application.Common.Interfaces
 {
     public interface IPlayerRepository
     {
-        PlayerModel GetMicrowave(Guid id);
+        PlayerModel? GetPlayer(string id);
         void Save(PlayerModel playerModel);
     }
 }

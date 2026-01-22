@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BlueCrocoWar.Application\BlueCrocoWar.Application.csproj" />
     <ProjectReference Include="..\BlueCrocoWar.Domain\BlueCrocoWar.Domain.csproj" />
+    <ProjectReference Include="..\BlueCrocoWar.Infrastructure\BlueCrocoWar.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

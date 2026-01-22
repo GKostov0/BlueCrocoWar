@@ -6,15 +6,17 @@ namespace BlueCrocoWar.Infrastructure.Repositories
 {
     public class PlayerRepository : IPlayerRepository
     {
-        private readonly ConcurrentDictionary<Guid, PlayerModel> _storage = new ConcurrentDictionary<Guid, PlayerModel>();
+        private readonly ConcurrentDictionary<string, PlayerModel> _storage = new ConcurrentDictionary<string, PlayerModel>();
 
-        public void Save(PlayerModel playerModel) => _storage[playerModel.Id] = playerModel;
-
-        public PlayerModel GetMicrowave(Guid id)
+        public PlayerModel? GetPlayer(string id)
         {
-            return _storage.TryGetValue(id, out var playerModel)
-                ? playerModel
-                : throw new InvalidOperationException($"Player with id {id} not found");
+            _storage.TryGetValue(id, out var result);
+            return result ?? null;
+        }
+
+        public void Save(PlayerModel playerModel)
+        {
+            _storage[playerModel.Id] = playerModel;
         }
     }
 }

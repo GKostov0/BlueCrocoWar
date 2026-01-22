@@ -1,9 +1,18 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using BlueCrocoWar.Application.Common.Interfaces;
+using BlueCrocoWar.Domain.Common.Models;
+using Microsoft.AspNetCore.SignalR;
 
 namespace BlueCrocoWar.Hubs;
 
 public class GameHub : Hub
 {
+    private IPlayerRepository _playerRepository;
+
+    public GameHub(IPlayerRepository playerRepository)
+    {
+        _playerRepository = playerRepository;
+    }
+
     // This is called when a client connects
     public override async Task OnConnectedAsync()
     {
@@ -18,9 +27,21 @@ public class GameHub : Hub
         await base.OnDisconnectedAsync(exception);
     }
 
-    public async Task SendMessage(string message)
+    // NOT the signalR ConnectionId
+    public async Task RegistePlayer(string playerId)
     {
-        Console.WriteLine($"Received from {Context.ConnectionId}: {message}");
-        await Clients.All.SendAsync("ReceiveMessage", $"Server echoes: {message}");
+        Console.WriteLine($"Registering new player with ID: [{playerId}]");
+
+        PlayerModel? result = _playerRepository.GetPlayer(playerId);
+
+        if (result == null)
+        {
+            _playerRepository.Save(new PlayerModel { Id = playerId });
+            Console.WriteLine($"Player [{playerId}] registered successfuly!");
+        }
+        else
+        {
+            Console.WriteLine($"Player [{playerId}] already registered.");
+        }
     }
 }

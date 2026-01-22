@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Common\Interfaces\" />
+    <ProjectReference Include="..\BlueCrocoWar.Domain\BlueCrocoWar.Domain.csproj" />
   </ItemGroup>
 
 </Project>

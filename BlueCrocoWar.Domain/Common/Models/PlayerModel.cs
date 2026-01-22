@@ -2,6 +2,6 @@
 {
     public class PlayerModel
     {
-        public Guid Id { get; private set; }
+        public string Id { get; set; }
     }
 }
