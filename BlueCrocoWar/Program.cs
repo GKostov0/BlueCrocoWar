@@ -12,7 +12,7 @@ builder.Services.AddSignalR(e =>
     //e.MaximumReceiveMessageSize = 102400000;
 });
 
-builder.Services.AddSingleton<IPlayerRepository, PlayerRepository>();
+builder.Services.AddSingleton<IGameRepository, GameRepository>();
 
 builder.Services.AddCors(options =>
 {

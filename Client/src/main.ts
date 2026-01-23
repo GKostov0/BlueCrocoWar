@@ -1,54 +1,40 @@
-import * as signalR from "@microsoft/signalr";
+import { PixiGame } from "./game/PixiGame";
+import { GameService } from "./services/GameService";
+import { SignalRService } from "./services/SignalRService";
 
-// Create connection
-const connection = new signalR.HubConnectionBuilder()
-    .withUrl('https://localhost:7126/gameHub', {
-        transport: signalR.HttpTransportType.WebSockets,
-        timeout: 15000
-    })
-    .build();
+class GameApp {
+    private pixiGame: PixiGame;
+    private gameService: GameService;
+    private signalRService: SignalRService;
 
-function getOrCreateUserId(): string {
-    let userId = localStorage.getItem('warGame_userId');
-    if (!userId) {
-        userId = crypto.randomUUID();
-        localStorage.setItem('warGame_userId', userId);
+    constructor() {
+        const gameContainer = document.getElementById('game-container')!;
+        this.pixiGame = new PixiGame(gameContainer);
+
+        this.gameService = new GameService(this.pixiGame.getSceneManager());
+        this.signalRService = new SignalRService(this.gameService);
+
+        this.initialize();
     }
-    return userId;
+
+    private async initialize(): Promise<void> {
+        try {
+            await this.signalRService.connect();
+        } catch (error) {
+            console.error("Failed to initialize game:", error);
+        }
+    }
+
+    public cleanup(): void {
+        this.signalRService.disconnect();
+        this.pixiGame.cleanup();
+    }
 }
 
-// connection.onclose((error) => {
-//     console.log('Connection closed', error?.message || '');
-// });
-
-// connection.onreconnecting((error) => {
-//     console.log('Reconnecting...', error?.message || '');
-// });
-
-// connection.onreconnected((connectionId) => {
-//     console.log('Reconnected with ID:', connectionId);
-// });
-
-try {
-    await connection.start();
-    console.log("Connected.");
-} catch (err) {
-    console.error("Connection failed: ", err);
-}
-await connection.invoke('RegistePlayer', getOrCreateUserId());
-
-// const interval = setInterval(async () => {
-//     if (connection.state === 'Connected') {
-//         try {
-//             await connection.invoke('SendMessage', `Keep alive - ${new Date().toLocaleTimeString()}`);
-//             console.log('Keep-alive message sent');
-//         } catch (error) {
-//             console.error('Error sending keep-alive:', error);
-//         }
-//     }
-// }, 5000);
-
-// window.addEventListener('beforeunload', () => {
-//     clearInterval(interval);
-//     connection.stop();
-// });
+document.addEventListener('DOMContentLoaded', () => {
+    const gameApp = new GameApp();
+    
+    window.addEventListener('beforeunload', () => {
+        gameApp.cleanup();
+    });
+});
