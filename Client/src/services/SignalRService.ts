@@ -19,11 +19,15 @@ export class SignalRService {
 
     private setupEventHandlers(): void {
         this.connection.on("PlayerJoinedLobby", (playerId: string) => {
-            this.gameService.handlePlayerJoined(playerId);
+            this.gameService.handlePlayerJoined();
         });
 
         this.connection.on("GameStarted", (gameData: any) => {
             this.gameService.handleGameStarted(gameData);
+        });
+
+        this.connection.on("OnHandPlayed", (gameData: any) => {
+            this.gameService.onHandPlayed(gameData);
         });
 
         this.connection.on("PlayerLeft", (playerId: string) => {
@@ -43,6 +47,11 @@ export class SignalRService {
             console.error("Connection failed: ", err);
             throw err;
         }
+    }
+
+    public async OnCardPlayed(): Promise<void>{
+        const userId = this.getOrCreateUserId();
+        await this.connection.invoke('PlayerCardPlayed', userId);
     }
 
     private getOrCreateUserId(): string {

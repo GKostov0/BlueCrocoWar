@@ -1,5 +1,6 @@
 ﻿using BlueCrocoWar.Application.Common.Interfaces;
 using BlueCrocoWar.Domain.Common.Models;
+using BlueCrocoWar.Domain.Services;
 using Microsoft.AspNetCore.SignalR;
 
 namespace BlueCrocoWar.Hubs;
@@ -69,8 +70,15 @@ public class GameHub : Hub
         {
             Console.WriteLine($"Connected to lobby [{result.Id}]");
             result.PlayerTwo = player;
+
+            result.Dealer = new GameDealer();
+            result.Dealer.ShuffleCards();
+            result.Dealer.DealToPlayers(result.PlayerOne, result.PlayerTwo);
+
             await Clients.Client(result.PlayerOne.ConnectionId).SendAsync("GameStarted");
             await Clients.Client(result.PlayerTwo.ConnectionId).SendAsync("GameStarted");
+
+            result.GameStarted = true;
         }
         else
         {
@@ -87,5 +95,25 @@ public class GameHub : Hub
     {
         Console.WriteLine($"Finding a lobby for player [{player.UserId}]");
         player.Lobby ??= await JoinOrCreateLobby(player);
+    }
+
+    public async void PlayerCardPlayed(string playerID)
+    {
+        PlayerModel? player = _gameRepository.GetPlayer(playerID);
+
+        if (player != null)
+        {
+            LobbyModel? lobby = player.Lobby;
+
+            if (lobby != null)
+            {
+                PlayCardResult? result = lobby.Dealer.PlayCard(player);
+                if (result != null)
+                {
+                    await Clients.Client(lobby.PlayerOne.ConnectionId).SendAsync("OnHandPlayed", result);
+                    await Clients.Client(lobby.PlayerTwo.ConnectionId).SendAsync("OnHandPlayed", result);
+                }
+            }
+        }
     }
 }

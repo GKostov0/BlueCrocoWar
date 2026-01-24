@@ -1,4 +1,6 @@
-﻿namespace BlueCrocoWar.Domain.Common.Models
+﻿using BlueCrocoWar.Domain.Services;
+
+namespace BlueCrocoWar.Domain.Common.Models
 {
     public class LobbyModel
     {
@@ -9,9 +11,12 @@
 
         public Guid Id { get; set; }
 
+        public GameDealer Dealer { get; set; }
         public PlayerModel? PlayerOne { get; set; }
         public PlayerModel? PlayerTwo { get; set; }
 
         public bool GameStarted { get; set; }
+
+        
     }
 }

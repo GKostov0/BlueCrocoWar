@@ -16,8 +16,4 @@ export abstract class BaseScene {
     public getContainer(): Container {
         return this.container;
     }
-
-    public onPlayerJoined?(playerId: string): void;
-    public onPlayerLeft?(playerId: string): void;
-    public onGameStarted?(gameData: any): void;
 }

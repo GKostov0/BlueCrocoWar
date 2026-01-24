@@ -10,9 +10,11 @@ class GameApp {
     constructor() {
         const gameContainer = document.getElementById('game-container')!;
         this.pixiGame = new PixiGame(gameContainer);
-
+        
         this.gameService = new GameService(this.pixiGame.getSceneManager());
         this.signalRService = new SignalRService(this.gameService);
+
+        this.pixiGame.setSignalRService(this.signalRService);
 
         this.initialize();
     }

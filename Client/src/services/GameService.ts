@@ -1,3 +1,4 @@
+import { GameScene } from "../scenes/GameScene";
 import { SceneManager } from "../scenes/SceneManager";
 
 export class GameService {
@@ -21,9 +22,13 @@ export class GameService {
         this.sceneManager.changeScene("game");
     }
 
+    public onHandPlayed(gameData: any): void {
+        const gameScene = this.sceneManager.getCurrentScene() as GameScene;
+        gameScene.UpdateUI();
+    }
+
     public handlePlayerLeft(playerId: string): void {
         console.log(`Player ${playerId} left`);
-        this.sceneManager.getCurrentScene()?.onPlayerLeft?.(playerId);
     }
 
     public getCurrentState(): GameState {
