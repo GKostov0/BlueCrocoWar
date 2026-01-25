@@ -1,6 +1,7 @@
 import { Application, Text, Graphics, Container } from "pixi.js";
 import { BaseScene } from "./BaseScene";
 import { SignalRService } from "../services/SignalRService";
+import { PlayCardResult } from '../models/PlayCardResult';
 
 export class GameScene extends BaseScene {
 
@@ -9,6 +10,9 @@ export class GameScene extends BaseScene {
     private scoreText: Text | null = null;
     private cardsLeftText: Text | null = null;
     private playButtonText: Text | null = null;
+
+    private myCardText: Text | null = null;
+    private opponentCardText: Text | null = null;
 
     private playContainer: Container | null = null;
     private playButton: Graphics | null = null;
@@ -37,11 +41,11 @@ export class GameScene extends BaseScene {
         this.playButton.cursor = 'pointer';
 
         this.myCard = new Graphics();
-        this.myCard.rect(this.app.screen.width / 2 - 75, 130, 150, 200);
+        this.myCard.rect(this.app.screen.width / 2 - 75, 450, 150, 200);
         this.myCard.fill(0x000000);
 
         this.opponentCard = new Graphics();
-        this.opponentCard.rect(this.app.screen.width / 2 - 75, 450, 150, 200);
+        this.opponentCard.rect(this.app.screen.width / 2 - 75, 130, 150, 200);
         this.opponentCard.fill(0x000000);
 
         this.scoreText = new Text({
@@ -56,6 +60,36 @@ export class GameScene extends BaseScene {
         position: {
             x: this.app.screen.width / 2,
             y: 50
+        }
+        });
+
+        this.myCardText = new Text({
+        text: '',
+        style: {
+            fill: '#ffffff',
+            fontSize: 24,
+            fontFamily: 'MyFont',
+            align: 'center',
+        },
+        anchor: 0.5,
+        position: {
+            x: this.app.screen.width / 2,
+            y: 500
+        }
+        });
+
+        this.opponentCardText = new Text({
+        text: '',
+        style: {
+            fill: '#ffffff',
+            fontSize: 24,
+            fontFamily: 'MyFont',
+            align: 'center',
+        },
+        anchor: 0.5,
+        position: {
+            x: this.app.screen.width / 2,
+            y: 180
         }
         });
 
@@ -94,6 +128,9 @@ export class GameScene extends BaseScene {
         this.container.addChild(this.cardsLeftText);
         this.container.addChild(this.scoreText);
 
+        this.container.addChild(this.myCardText);
+        this.container.addChild(this.opponentCardText);
+
         this.playContainer.addChild(this.playButton);
         this.playContainer.addChild(this.playButtonText);
 
@@ -106,14 +143,32 @@ export class GameScene extends BaseScene {
 
     public async cardPlayed(): Promise<void>
     {
-        console.log('first step passed');
+        this.playButton!.eventMode = 'none';
+        this.playButton!.cursor = 'default';
         await this.signalRService?.OnCardPlayed();
-        console.log('second step passed');
     }
 
-    public UpdateUI(): void
+    public UpdateUI(result: PlayCardResult): void
     {
-        console.log('update UI');
+        if (this.signalRService?.getOrCreateUserId() === result.playerId)
+        {
+            this.myCardText!.text = result.rank + ' ' + result.suit;
+            this.cardsLeftText!.text = 'Cards: ' + result.cardsLeft;
+        }
+        else {
+            this.opponentCardText!.text = result.rank + ' ' + result.suit;
+        }
+
+        if (result.clearUI)
+        {
+            setTimeout(() => {
+                this.myCardText!.text = '';
+                this.opponentCardText!.text = '';
+
+                this.playButton!.eventMode = 'static';
+                this.playButton!.cursor = 'pointer';
+            }, 1000);
+        }
     }
 
     public update(delta: number): void {

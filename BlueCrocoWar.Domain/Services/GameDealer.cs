@@ -5,8 +5,6 @@ namespace BlueCrocoWar.Domain.Services
 {
     public class GameDealer
     {
-        public PlayerModel CurrentPlayerTurn { get; private set; }
-
         private PlayerModel _playerOne;
         private PlayerModel _playerTwo;
 
@@ -36,25 +34,26 @@ namespace BlueCrocoWar.Domain.Services
 
             _playerOne.PlayerCards = new Queue<Card>(PlayCards.Take(half));
             _playerTwo.PlayerCards = new Queue<Card>(PlayCards.Skip(half).Take(half));
-
-            CurrentPlayerTurn = _playerOne;
         }
 
         public PlayCardResult? PlayCard(PlayerModel player)
         {
-            if (CurrentPlayerTurn.TurnPlayed)
+            if (player.TurnPlayed)
                 return null;
+
+            player.TurnPlayed = true;
+
+            HandleHandResult();
 
             PlayCardResult result = new PlayCardResult
             {
+                PlayerId = player.UserId,
                 Rank = player.PlayerCards.Peek().Rank.ToString(),
-                Suit = player.PlayerCards.Peek().Suit.ToString()
+                Suit = player.PlayerCards.Peek().Suit.ToString(),
+                CardsLeft = player.PlayerCards.Count,
+                OtherCardsLeft = player.UserId == _playerOne.UserId ? _playerTwo.PlayerCards.Count : _playerOne.PlayerCards.Count,
+                ClearUI = _playerOne.TurnPlayed && _playerTwo.TurnPlayed
             };
-
-            CurrentPlayerTurn.TurnPlayed = true;
-            HandleHandResult();
-
-            CurrentPlayerTurn = CurrentPlayerTurn == _playerOne ? _playerTwo : _playerOne;
 
             return result;
         }

@@ -1,5 +1,6 @@
 import * as signalR from "@microsoft/signalr";
 import { GameService } from "./GameService";
+import { PlayCardResult } from '../models/PlayCardResult';
 
 export class SignalRService {
     private connection: signalR.HubConnection;
@@ -26,7 +27,7 @@ export class SignalRService {
             this.gameService.handleGameStarted(gameData);
         });
 
-        this.connection.on("OnHandPlayed", (gameData: any) => {
+        this.connection.on("OnHandPlayed", (gameData: PlayCardResult) => {
             this.gameService.onHandPlayed(gameData);
         });
 
@@ -54,7 +55,7 @@ export class SignalRService {
         await this.connection.invoke('PlayerCardPlayed', userId);
     }
 
-    private getOrCreateUserId(): string {
+    public getOrCreateUserId(): string {
         let userId = localStorage.getItem('warGame_userId');
         if (!userId) {
             userId = crypto.randomUUID();

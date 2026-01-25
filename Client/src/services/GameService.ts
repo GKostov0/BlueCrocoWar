@@ -1,5 +1,6 @@
 import { GameScene } from "../scenes/GameScene";
 import { SceneManager } from "../scenes/SceneManager";
+import { PlayCardResult } from '../models/PlayCardResult';
 
 export class GameService {
     private sceneManager: SceneManager;
@@ -22,9 +23,9 @@ export class GameService {
         this.sceneManager.changeScene("game");
     }
 
-    public onHandPlayed(gameData: any): void {
+    public onHandPlayed(gameData: PlayCardResult): void {
         const gameScene = this.sceneManager.getCurrentScene() as GameScene;
-        gameScene.UpdateUI();
+        gameScene.UpdateUI(gameData);
     }
 
     public handlePlayerLeft(playerId: string): void {

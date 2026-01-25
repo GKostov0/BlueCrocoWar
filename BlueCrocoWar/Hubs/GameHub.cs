@@ -101,10 +101,9 @@ public class GameHub : Hub
     {
         PlayerModel? player = _gameRepository.GetPlayer(playerID);
 
-        if (player != null)
+        if (player != null && !player.TurnPlayed)
         {
             LobbyModel? lobby = player.Lobby;
-
             if (lobby != null)
             {
                 PlayCardResult? result = lobby.Dealer.PlayCard(player);
