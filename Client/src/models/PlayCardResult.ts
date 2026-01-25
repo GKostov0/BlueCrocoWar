@@ -3,6 +3,5 @@ export interface PlayCardResult {
     suit: string;
     rank: string;
     cardsLeft: number;
-    otherCardsLeft: number;
     clearUI: boolean;
 }

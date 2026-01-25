@@ -38,32 +38,42 @@ namespace BlueCrocoWar.Domain.Services
 
         public PlayCardResult? PlayCard(PlayerModel player)
         {
-            if (player.TurnPlayed)
+            if (player.TurnPlayed || player.PlayerCards.Count == 0)
                 return null;
 
             player.TurnPlayed = true;
 
-            HandleHandResult();
+            Card playedCard = player.PlayerCards.Peek();
+            string rank = playedCard.Rank.ToString();
+            string suit = playedCard.Suit.ToString();
+            int initialCount = player.PlayerCards.Count;
+
+            bool handDelt = HandleHandResult();
 
             PlayCardResult result = new PlayCardResult
             {
                 PlayerId = player.UserId,
-                Rank = player.PlayerCards.Peek().Rank.ToString(),
-                Suit = player.PlayerCards.Peek().Suit.ToString(),
-                CardsLeft = player.PlayerCards.Count,
-                OtherCardsLeft = player.UserId == _playerOne.UserId ? _playerTwo.PlayerCards.Count : _playerOne.PlayerCards.Count,
-                ClearUI = _playerOne.TurnPlayed && _playerTwo.TurnPlayed
+                Rank = rank,
+                Suit = suit,
+                CardsLeft = handDelt ? player.PlayerCards.Count : player.PlayerCards.Count - 1,
+                ClearUI = handDelt
             };
+            Console.WriteLine($"Player {player.UserId} played {rank} of {suit}. Cards left: {result.CardsLeft} (was {initialCount})");
 
             return result;
+
         }
 
-        private void HandleHandResult()
+        private bool HandleHandResult()
         {
+            bool handDelt = false;
+
             if (_playerOne.TurnPlayed && _playerTwo.TurnPlayed)
             {
                 if (_playerOne.PlayerCards.Count > 0 && _playerTwo.PlayerCards.Count > 0)
                 {
+                    handDelt = true;
+
                     Card p1Card = _playerOne.PlayerCards.Dequeue();
                     Card p2Card = _playerTwo.PlayerCards.Dequeue();
 
@@ -98,6 +108,8 @@ namespace BlueCrocoWar.Domain.Services
             {
                 // Someone hasnt played their turn yet...
             }
+
+            return handDelt;
         }
     }
 }
