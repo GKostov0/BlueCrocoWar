@@ -1,4 +1,4 @@
-﻿using BlueCrocoWar.Application.Common.Interfaces;
+using BlueCrocoWar.Application.Common.Interfaces;
 using BlueCrocoWar.Domain.Common.Models;
 using BlueCrocoWar.Domain.Services;
 using Microsoft.AspNetCore.SignalR;
@@ -14,22 +14,26 @@ public class GameHub : Hub
         _gameRepository = playerRepository;
     }
 
-    // This is called when a client connects
     public override async Task OnConnectedAsync()
     {
         Console.WriteLine($"Client connected: {Context.ConnectionId}");
         await base.OnConnectedAsync();
     }
 
-    // This is called when a client disconnects
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
         Console.WriteLine($"Client disconnected: {Context.ConnectionId}");
+        
+        var player = _gameRepository.GetPlayerByConnectionId(Context.ConnectionId);
+        if (player != null)
+        {
+            Console.WriteLine($"Player {player.UserId} disconnected. Connection ID updated.");
+        }
+        
         await base.OnDisconnectedAsync(exception);
     }
 
-    // NOT the signalR ConnectionId
-    public async void RegisterPlayer(string playerId, string connectionID)
+    public async Task RegisterPlayer(string playerId, string connectionID)
     {
         Console.WriteLine($"Registering new player with ID: [{playerId}]");
 
@@ -39,14 +43,29 @@ public class GameHub : Hub
         {
             playerResult = new PlayerModel { UserId = playerId, ConnectionId = connectionID };
             _gameRepository.SavePlayer(playerResult);
-            Console.WriteLine($"Player [{playerId}] registered successfuly!");
+            Console.WriteLine($"Player [{playerId}] registered successfully!");
         }
         else
         {
-            Console.WriteLine($"Player [{playerId}] already registered.");
+            // Update connection ID for reconnection
+            playerResult.ConnectionId = connectionID;
+            _gameRepository.SavePlayer(playerResult);
+            Console.WriteLine($"Player [{playerId}] reconnected. Connection ID updated.");
+            
+            if (playerResult.Lobby != null && playerResult.Lobby.GameStarted)
+            {
+                await Clients.Client(connectionID).SendAsync("GameStarted");
+            }
+            else
+            {
+                await AddPlayerToLobby(playerResult);
+            }
         }
 
-        await AddPlayerToLobby(playerResult);
+        if (playerResult.Lobby == null)
+        {
+            await AddPlayerToLobby(playerResult);
+        }
     }
 
     private LobbyModel CreateLobby()
@@ -97,20 +116,28 @@ public class GameHub : Hub
         player.Lobby ??= await JoinOrCreateLobby(player);
     }
 
-    public async void PlayerCardPlayed(string playerID)
+    public async Task PlayerCardPlayed(string playerID)
     {
         PlayerModel? player = _gameRepository.GetPlayer(playerID);
 
         if (player != null && !player.TurnPlayed)
         {
             LobbyModel? lobby = player.Lobby;
-            if (lobby != null)
+            if (lobby != null && lobby.GameStarted)
             {
                 PlayCardResult? result = lobby.Dealer.PlayCard(player);
                 if (result != null)
                 {
+                    // Send the result to both players
                     await Clients.Client(lobby.PlayerOne.ConnectionId).SendAsync("OnHandPlayed", result);
                     await Clients.Client(lobby.PlayerTwo.ConnectionId).SendAsync("OnHandPlayed", result);
+                    
+                    // Game over - notify both players
+                    if (result.GameOver && !string.IsNullOrEmpty(result.GameWinnerId))
+                    {
+                        await Clients.Client(lobby.PlayerOne.ConnectionId).SendAsync("GameOver", result.GameWinnerId);
+                        await Clients.Client(lobby.PlayerTwo.ConnectionId).SendAsync("GameOver", result.GameWinnerId);
+                    }
                 }
             }
         }

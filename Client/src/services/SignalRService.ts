@@ -31,6 +31,10 @@ export class SignalRService {
             this.gameService.onHandPlayed(gameData);
         });
 
+        this.connection.on("GameOver", (winnerId: string) => {
+            this.gameService.handleGameOver(winnerId);
+        });
+
         this.connection.on("PlayerLeft", (playerId: string) => {
             this.gameService.handlePlayerLeft(playerId);
         });

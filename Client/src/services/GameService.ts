@@ -32,6 +32,13 @@ export class GameService {
         console.log(`Player ${playerId} left`);
     }
 
+    public handleGameOver(winnerId: string): void {
+        console.log("Game over! Winner:", winnerId);
+        this.currentGameState = GameState.GameOver;
+        const gameScene = this.sceneManager.getCurrentScene() as GameScene;
+        gameScene.showGameOver(winnerId);
+    }
+
     public getCurrentState(): GameState {
         return this.currentGameState;
     }

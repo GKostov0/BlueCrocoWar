@@ -1,4 +1,4 @@
-﻿using BlueCrocoWar.Application.Common.Interfaces;
+using BlueCrocoWar.Application.Common.Interfaces;
 using BlueCrocoWar.Domain.Common.Models;
 using System.Collections.Concurrent;
 
@@ -19,6 +19,11 @@ namespace BlueCrocoWar.Infrastructure.Repositories
         {
             _playerStorage.TryGetValue(id, out var result);
             return result ?? null;
+        }
+
+        public PlayerModel? GetPlayerByConnectionId(string connectionId)
+        {
+            return _playerStorage.Values.FirstOrDefault(p => p.ConnectionId == connectionId);
         }
 
         public void SaveLobby(LobbyModel lobbyModel)

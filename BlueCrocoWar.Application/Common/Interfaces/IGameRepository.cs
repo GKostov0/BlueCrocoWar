@@ -1,4 +1,4 @@
-﻿using BlueCrocoWar.Domain.Common.Models;
+using BlueCrocoWar.Domain.Common.Models;
 
 namespace BlueCrocoWar.Application.Common.Interfaces
 {
@@ -6,6 +6,7 @@ namespace BlueCrocoWar.Application.Common.Interfaces
     {
         LobbyModel? GetLobby(Guid id);
         PlayerModel? GetPlayer(string id);
+        PlayerModel? GetPlayerByConnectionId(string connectionId);
 
         void SavePlayer(PlayerModel playerModel);
         void SaveLobby(LobbyModel lobbyModel);
